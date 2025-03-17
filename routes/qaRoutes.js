@@ -1,5 +1,5 @@
 const express = require('express');
-const { Client } = require('pg'); // Needed for the new route
+const { Client } = require('pg'); // For direct DB access in our custom route
 const {
     addQuestion,
     addQuestionOptions,

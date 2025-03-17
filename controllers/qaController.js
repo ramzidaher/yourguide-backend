@@ -96,55 +96,6 @@ const saveUserAnswers = async (userId, answers) => {
     await client.end();
 };
 
-
-// GET /api/qa/question/:id - Retrieve a single question with its options
-router.get('/question/:id', authenticateToken, async (req, res) => {
-    const questionId = req.params.id;
-
-    try {
-        const client = new Client({ connectionString: process.env.DB_URI });
-        await client.connect();
-
-        // Retrieve the question by ID
-        const questionRes = await client.query(
-            'SELECT id, question_text FROM questions WHERE id = $1',
-            [questionId]
-        );
-
-        if (questionRes.rows.length === 0) {
-            await client.end();
-            return res.status(404).json({ message: 'Question not found' });
-        }
-
-        const question = questionRes.rows[0];
-
-        // Retrieve the options for the question
-        const optionsRes = await client.query(
-            'SELECT id, option_text FROM answer_options WHERE question_id = $1',
-            [questionId]
-        );
-
-        await client.end();
-
-        // Format the response
-        const responseObject = {
-            id: question.id,
-            question: question.question_text,
-            options: optionsRes.rows.map(option => ({
-                id: option.id,
-                text: option.option_text
-            }))
-        };
-
-        res.json(responseObject);
-    } catch (error) {
-        console.error('Error fetching question:', error);
-        res.status(500).json({ message: 'Error fetching question', error: error.message });
-    }
-});
-
-
-
 /**
  * Delete a question (and cascade delete options/answers if set up in the DB).
  * @param {number} questionId
