@@ -128,4 +128,61 @@ router.post('/add-answer', authenticateToken, async (req, res) => {
     }
 });
 
+
+// GET /api/qa/topic-question/:industryId - Retrieve topic question based on industry
+// GET /api/qa/topic-question/:industryId - Retrieve topic question based on industry
+router.get('/topic-question/:industryId', authenticateToken, async (req, res) => {
+    const { industryId } = req.params;  // Get the industryId from the request parameters
+
+    try {
+        const client = new Client({ connectionString: process.env.DB_URI });
+        await client.connect();
+
+        // Query the industry_question_map table to find the topic question based on the selected industry
+        const query = `
+            SELECT q.id, q.question_text
+            FROM industry_question_map iqm
+            JOIN questions q ON iqm.question_id = q.id
+            WHERE iqm.industry_option_id = $1
+        `;
+
+        const result = await client.query(query, [industryId]);
+
+        if (result.rows.length === 0) {
+            await client.end();
+            return res.status(404).json({ message: 'No topic question found for this industry' });
+        }
+
+        const topicQuestion = result.rows[0];
+
+        // Fetch options for this specific topic question (Q3)
+        const optionsQuery = `
+            SELECT id, option_text
+            FROM answer_options
+            WHERE question_id = $1
+        `;
+        const optionsRes = await client.query(optionsQuery, [topicQuestion.id]);
+
+        await client.end();
+
+        // Send the topic question and its options in the response
+        res.json({
+            id: topicQuestion.id,
+            question: topicQuestion.question_text,
+            options: optionsRes.rows.map(option => ({
+                id: option.id,
+                text: option.option_text
+            }))
+        });
+    } catch (error) {
+        console.error('Error fetching topic question:', error);
+        res.status(500).json({ message: 'Error fetching topic question', error: error.message });
+    }
+});
+
+
+
+
+
+
 module.exports = router;
