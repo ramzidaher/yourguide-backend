@@ -130,7 +130,6 @@ router.post('/add-answer', authenticateToken, async (req, res) => {
 
 
 // GET /api/qa/topic-question/:industryId - Retrieve topic question based on industry
-// GET /api/qa/topic-question/:industryId - Retrieve topic question based on industry
 router.get('/topic-question/:industryId', authenticateToken, async (req, res) => {
     const { industryId } = req.params;  // Get the industryId from the request parameters
 
@@ -138,24 +137,47 @@ router.get('/topic-question/:industryId', authenticateToken, async (req, res) =>
         const client = new Client({ connectionString: process.env.DB_URI });
         await client.connect();
 
-        // Query the industry_question_map table to find the topic question based on the selected industry
-        const query = `
-            SELECT q.id, q.question_text
-            FROM industry_question_map iqm
-            JOIN questions q ON iqm.question_id = q.id
-            WHERE iqm.industry_option_id = $1
-        `;
-
-        const result = await client.query(query, [industryId]);
-
-        if (result.rows.length === 0) {
-            await client.end();
-            return res.status(404).json({ message: 'No topic question found for this industry' });
+        // Determine the next question based on the selected industry
+        let nextQuestionId;
+        switch (industryId) {
+            case '1': // Finance & Banking
+                nextQuestionId = 5;
+                break;
+            case '2': // Technology & Software Development
+                nextQuestionId = 3;
+                break;
+            case '3': // Hospitality & Tourism
+                nextQuestionId = 6;
+                break;
+            case '4': // Business & Marketing
+                nextQuestionId = 7;
+                break;
+            case '5': // Language Studies
+                nextQuestionId = 8;
+                break;
+            case '6': // Media & Entertainment
+                nextQuestionId = 9;
+                break;
+            default:
+                nextQuestionId = 2; // Default to the next general question (Industry Selection)
         }
 
-        const topicQuestion = result.rows[0];
+        // Fetch the next question based on nextQuestionId
+        const questionQuery = `
+            SELECT id, question_text
+            FROM questions
+            WHERE id = $1
+        `;
+        const questionRes = await client.query(questionQuery, [nextQuestionId]);
 
-        // Fetch options for this specific topic question (Q3)
+        if (questionRes.rows.length === 0) {
+            await client.end();
+            return res.status(404).json({ message: 'No question found for this industry' });
+        }
+
+        const topicQuestion = questionRes.rows[0];
+
+        // Fetch the options for this specific topic question (Q3)
         const optionsQuery = `
             SELECT id, option_text
             FROM answer_options
