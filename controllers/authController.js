@@ -2,7 +2,26 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Client } = require('pg');
 
-// Register User
+/**
+ * @swagger
+ * /db/register-user:
+ *   post:
+ *     summary: Internal function to register a user.
+ *     description: >
+ *       This function is used internally to register a new user.
+ *       It performs the following steps:
+ *         - Hashes the provided password using bcrypt,
+ *         - Inserts the user details into the 'users' table,
+ *         - Catches errors such as duplicate entries.
+ *       Though not exposed as an API endpoint, this function's logic is critical to the registration process.
+ *     tags: [Auth - Controller, Internal]
+ *     requestBody:
+ *       description: JSON payload containing user details.
+ *       required: true
+ *     responses:
+ *       200:
+ *         description: User registered successfully.
+ */
 const registerUser = async (forename, family_name, username, password) => {
     const client = new Client({ connectionString: process.env.DB_URI });
     await client.connect();
@@ -25,7 +44,25 @@ const registerUser = async (forename, family_name, username, password) => {
     }
 };
 
-// Login User
+/**
+ * @swagger
+ * /db/login-user:
+ *   post:
+ *     summary: Internal function to authenticate a user.
+ *     description: >
+ *       This function verifies user credentials by:
+ *         - Retrieving user data from the database,
+ *         - Comparing the provided password with the stored hash,
+ *         - Generating a JWT token upon successful authentication.
+ *       It ensures that the user's password remains secure and is not exposed in the response.
+ *     tags: [Auth - Controller, Internal]
+ *     requestBody:
+ *       description: JSON payload containing username and password.
+ *       required: true
+ *     responses:
+ *       200:
+ *         description: User authenticated successfully, returns a token.
+ */
 const loginUser = async (username, password) => {
     const client = new Client({ connectionString: process.env.DB_URI });
     await client.connect();

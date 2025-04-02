@@ -1,8 +1,40 @@
 const { Client } = require('pg');
 
 /**
- * Save or update recommended courses for a user.
+ * @swagger
+ * /db/save-user-courses:
+ *   post:
+ *     summary: Save or update recommended courses for a user.
+ *     description: Saves a list of courses for a given user in the database.
+ *     tags: [User Courses - Controller]
+ *     requestBody:
+ *       description: JSON payload containing userId and courses array.
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: number
+ *               courses:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     course_title:
+ *                       type: string
+ *                     provider:
+ *                       type: string
+ *                     url:
+ *                       type: string
+ *                     image:
+ *                       type: string
+ *     responses:
+ *       200:
+ *         description: Courses saved successfully.
  */
+
 const saveUserCourses = async (req, res) => {
     const { userId, courses } = req.body;
 
@@ -45,8 +77,24 @@ const saveUserCourses = async (req, res) => {
 };
 
 /**
- * Get saved courses for a user.
+ * @swagger
+ * /db/get-user-courses:
+ *   get:
+ *     summary: Get saved courses for a user.
+ *     description: Retrieves saved courses for a specified user from the database.
+ *     tags: [User Courses - Controller]
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: ID of the user.
+ *     responses:
+ *       200:
+ *         description: List of saved courses.
  */
+
 const getUserCourses = async (req, res) => {
     const { userId } = req.params;
 
@@ -73,6 +121,36 @@ const getUserCourses = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error fetching courses.', error: error.message });
     }
 };
+
+/**
+ * @swagger
+ * /db/save-manual-course:
+ *   post:
+ *     summary: Save a manually added course for a user.
+ *     description: Inserts or updates a manual course entry for a user in the database.
+ *     tags: [User Courses - Controller]
+ *     requestBody:
+ *       description: JSON payload containing userId, course_title, provider, link, and image_url.
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: number
+ *               course_title:
+ *                 type: string
+ *               provider:
+ *                 type: string
+ *               link:
+ *                 type: string
+ *               image_url:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Course added successfully.
+ */
 
 const saveManualCourse = async (req, res) => {
     const { userId, course_title, provider, link, image_url } = req.body;

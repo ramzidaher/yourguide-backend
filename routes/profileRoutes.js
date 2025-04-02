@@ -3,7 +3,64 @@ const { Client } = require('pg');
 const authenticateToken = require('../middleware/authMiddleware');
 
 const router = express.Router();
-
+/**
+ * @swagger
+ * /api/profile:
+ *   get:
+ *     summary: Get user profile data.
+ *     description: Retrieves the user's profile details, answered questions, and saved courses.
+ *     tags: [Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile data retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: number
+ *                     forename:
+ *                       type: string
+ *                     family_name:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                 questions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: number
+ *                       question:
+ *                         type: string
+ *                       answer:
+ *                         type: string
+ *                         nullable: true
+ *                 courses:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       title:
+ *                         type: string
+ *                       provider:
+ *                         type: string
+ *                       link:
+ *                         type: string
+ *                       image:
+ *                         type: string
+ *       404:
+ *         description: User not found.
+ *       500:
+ *         description: Internal Server Error.
+ */
 router.get('/profile', authenticateToken, async (req, res) => {
     const userId = req.userId;
     try {

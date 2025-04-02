@@ -4,6 +4,19 @@ const authenticateToken = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /db/get-profile:
+ *   get:
+ *     summary: Retrieve user profile data.
+ *     description: Fetches the user's profile details, including personal info, answered questions, and saved courses.
+ *     tags: [Profile - Controller]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile data retrieved successfully.
+ */
 router.get('/profile', authenticateToken, async (req, res) => {
     const userId = req.userId;
     try {

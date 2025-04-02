@@ -2,10 +2,27 @@ const { Client } = require('pg');
 const axios = require('axios');
 const ogs = require('open-graph-scraper');
 
+
 /**
- * Add a new question.
- * @param {string} questionText
- * @returns {number} New question ID
+ * @swagger
+ * /db/add-question:
+ *   post:
+ *     summary: Add a new question.
+ *     description: Inserts a new question into the database.
+ *     tags: [Questions - Controller]
+ *     requestBody:
+ *       description: Question text to be added.
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               questionText:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Returns the new question ID.
  */
 const addQuestion = async (questionText) => {
     const client = new Client({ connectionString: process.env.DB_URI });
@@ -17,9 +34,29 @@ const addQuestion = async (questionText) => {
 };
 
 /**
- * Add options for a given question.
- * @param {number} questionId
- * @param {Array<string>} options
+ * @swagger
+ * /db/add-question-options:
+ *   post:
+ *     summary: Add options for a question.
+ *     description: Inserts answer options for a given question.
+ *     tags: [Questions - Controller]
+ *     requestBody:
+ *       description: JSON payload containing the question ID and an array of option texts.
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               questionId:
+ *                 type: number
+ *               options:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Options added successfully.
  */
 const addQuestionOptions = async (questionId, options) => {
     const client = new Client({ connectionString: process.env.DB_URI });
@@ -32,8 +69,15 @@ const addQuestionOptions = async (questionId, options) => {
 };
 
 /**
- * Retrieve all questions with their options.
- * @returns {Array<Object>}
+ * @swagger
+ * /db/get-all-questions-with-options:
+ *   get:
+ *     summary: Retrieve all questions with options.
+ *     description: Fetches all questions and their corresponding options from the database.
+ *     tags: [Questions - Controller]
+ *     responses:
+ *       200:
+ *         description: An array of questions with options.
  */
 const getAllQuestionsWithOptions = async () => {
     const client = new Client({ connectionString: process.env.DB_URI });
@@ -58,9 +102,36 @@ const getAllQuestionsWithOptions = async () => {
 };
 
 /**
- * Save user answers.
- * @param {number} userId
- * @param {Array<Object>} answers - Each object should have { questionId, answer }
+ * @swagger
+ * /db/save-user-answers:
+ *   post:
+ *     summary: Save user answers.
+ *     description: Inserts or updates user answers for given questions.
+ *     tags: [Questions - Controller]
+ *     requestBody:
+ *       description: JSON payload containing the user ID and an array of answers.
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: number
+ *               answers:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     questionId:
+ *                       type: number
+ *                     answer:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *     responses:
+ *       200:
+ *         description: Answers saved successfully.
  */
 const saveUserAnswers = async (userId, answers) => {
     const client = new Client({ connectionString: process.env.DB_URI });
@@ -97,9 +168,22 @@ const saveUserAnswers = async (userId, answers) => {
 };
 
 /**
- * Delete a question (and cascade delete options/answers if set up in the DB).
- * @param {number} questionId
- * @returns {Object} Result with success flag and message
+ * @swagger
+ * /db/delete-question:
+ *   delete:
+ *     summary: Delete a question.
+ *     description: Deletes a question from the database and cascades the delete to options.
+ *     tags: [Questions - Controller]
+ *     parameters:
+ *       - in: query
+ *         name: questionId
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: The ID of the question to delete.
+ *     responses:
+ *       200:
+ *         description: Question deleted successfully.
  */
 const deleteQuestion = async (questionId) => {
     const client = new Client({ connectionString: process.env.DB_URI });
