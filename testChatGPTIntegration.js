@@ -17,8 +17,8 @@ const PLATFORM_PLACEHOLDERS = {
 
 const loginUser = async () => {
     const response = await axios.post(`${baseUrl}/auth/login`, {
-        username: 'RAMZI2',
-        password: 'RAMZI'
+        username: 'Ramzi',
+        password: '2003'
     });
     console.log('✅ User logged in, JWT token received.');
     return response.data.token;

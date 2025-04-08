@@ -1,5 +1,5 @@
 const express = require('express');
-const { saveManualCourse, saveUserCourses, getUserCourses } = require('../controllers/userCoursesController');
+const { saveManualCourse, saveUserCourses, getUserCourses, deleteAllCourses } = require('../controllers/userCoursesController');
 const authenticateToken = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -161,4 +161,9 @@ router.post('/save', authenticateToken, saveUserCourses);
  */
 router.get('/user/:userId', authenticateToken, getUserCourses);
 
+// New route to delete all courses
+router.delete('/delete-all-courses', deleteAllCourses);
+
 module.exports = router;
+
+

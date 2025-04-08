@@ -187,8 +187,46 @@ const saveManualCourse = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /db/delete-all-courses:
+ *   delete:
+ *     summary: Delete all courses for all users.
+ *     description: Deletes all courses from the database.
+ *     tags: [User Courses - Controller]
+ *     responses:
+ *       200:
+ *         description: All courses deleted successfully.
+ *       500:
+ *         description: Error occurred while deleting courses.
+ */
+
+const deleteAllCourses = async (req, res) => {
+    const client = new Client({ connectionString: process.env.DB_URI });
+    await client.connect();
+
+    try {
+        console.log('🗑️ Deleting all courses from the database');
+
+        const query = `
+            DELETE FROM user_courses;
+        `;
+
+        await client.query(query);
+
+        res.json({ success: true, message: 'All courses deleted successfully.' });
+    } catch (error) {
+        console.error('❌ Error deleting courses:', error.message);
+        res.status(500).json({ success: false, message: 'Error deleting courses.', error: error.message });
+    } finally {
+        await client.end();
+    }
+};
+
+
 module.exports = {
     saveUserCourses,
     getUserCourses,
-    saveManualCourse
+    saveManualCourse,
+    deleteAllCourses
 };

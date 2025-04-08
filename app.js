@@ -9,7 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const qaRoutes = require('./routes/qaRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const userCoursesRoutes = require('./routes/userCoursesRoutes');
-
+const coursesRoutes = require('./routes/coursesRoutes'); // Import the new course processing route
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -25,7 +25,7 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: 'http://localhost:3000/api',
+                url: 'http://3.11.88.9:3000/',
             },
         ],
     },
@@ -40,6 +40,7 @@ app.use('/api/auth/', authRoutes);
 app.use('/api/qa', qaRoutes);
 app.use('/api', profileRoutes);
 app.use('/api/courses', userCoursesRoutes); // New course routes
+app.use('/api/courses', coursesRoutes); // New route for processing courses
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
